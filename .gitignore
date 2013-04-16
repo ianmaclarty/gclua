@@ -16,5 +16,7 @@
 *.out
 *.app
 
-# vim
 *~
+tags
+lua
+luac
