@@ -8,12 +8,14 @@
 PLAT= none
 
 CC= gcc
-#DEBUG_FLAGS=-O0 -g
+ifdef LUA_DEBUG
+DEBUG_FLAGS=-O0 -g -DLUA_DEBUG
+endif
 CFLAGS= -O2 -Wall $(DEBUG_FLAGS) $(MYCFLAGS)
 AR= ar rcu
 RANLIB= ranlib
 RM= rm -f
-LIBS= -lm $(MYLIBS) -L../.. -lgc
+LIBS= -lm $(MYLIBS) -lgc
 
 MYCFLAGS=
 MYLDFLAGS=

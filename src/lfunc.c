@@ -21,6 +21,9 @@
 
 Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) {
   Closure *c = cast(Closure *, luaM_malloc(sizeCclosure(nelems)));
+#ifdef LUA_DEBUG
+  c->c.tt = LUA_TFUNCTION;
+#endif
   c->c.isC = 1;
   c->c.env = e;
   c->c.nupvalues = cast_byte(nelems);
@@ -30,6 +33,9 @@ Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) {
 
 Closure *luaF_newLclosure (lua_State *L, int nelems, Table *e) {
   Closure *c = cast(Closure *, luaM_malloc(sizeLclosure(nelems)));
+#ifdef LUA_DEBUG
+  c->l.tt = LUA_TFUNCTION;
+#endif
   c->l.isC = 0;
   c->l.env = e;
   c->l.nupvalues = cast_byte(nelems);
@@ -39,6 +45,9 @@ Closure *luaF_newLclosure (lua_State *L, int nelems, Table *e) {
 
 UpVal *luaF_newupval (lua_State *L) {
   UpVal *uv = luaM_new(L, UpVal);
+#ifdef LUA_DEBUG
+  uv->tt = LUA_TUPVAL;
+#endif
   uv->uvnext = NULL;  /* luaF_newupval  is only called in ldo.c
                        * when deserializing a dumped closure with upvalues.
                        * The resulting upvalues will be closed, so uvnext will
@@ -55,14 +64,16 @@ UpVal *luaF_findupval (lua_State *L, StkId level) {
   UpVal *p;
   UpVal *uv;
   while (*pp != NULL && (p = *pp)->v >= level) {
-    lua_assert(p->v != &p->u.value);
+    lua_assert(p->v != &p->value);
     if (p->v == level) {  /* found a corresponding upvalue? */
       return p;
     }
     pp = &p->uvnext;
   }
   uv = luaM_new(L, UpVal);  /* not found: create a new one */
+#ifdef LUA_DEBUG
   uv->tt = LUA_TUPVAL;
+#endif
   uv->v = level;  /* current value lives in the stack */
   uv->uvnext = *pp;  /* chain it in the proper position */
   *pp = uv;
@@ -72,7 +83,7 @@ UpVal *luaF_findupval (lua_State *L, StkId level) {
 void luaF_close (lua_State *L, StkId level) {
   UpVal *uv;
   while (L->openupval != NULL && (uv = L->openupval)->v >= level) {
-    lua_assert(!isblack(o) && uv->v != &uv->u.value);
+    lua_assert(uv->v != &uv->value);
     L->openupval = uv->uvnext;  /* remove from `open' list */
     setobj(L, &uv->value, uv->v);
     uv->v = &uv->value;  /* now current value lives here */
@@ -82,6 +93,9 @@ void luaF_close (lua_State *L, StkId level) {
 
 Proto *luaF_newproto (lua_State *L) {
   Proto *f = luaM_new(L, Proto);
+#ifdef LUA_DEBUG
+  f->tt = LUA_TPROTO;
+#endif
   f->k = NULL;
   f->sizek = 0;
   f->p = NULL;

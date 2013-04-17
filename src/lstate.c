@@ -101,6 +101,9 @@ static void close_state (lua_State *L) {
 
 lua_State *luaE_newthread (lua_State *L) {
   lua_State *L1 = tostate(luaM_malloc(state_size(lua_State)));
+#ifdef LUA_DEBUG
+  L1->tt = LUA_TTHREAD;
+#endif
   preinit_state(L1, G(L));
   stack_init(L1, L);  /* init stack */
   setobj2n(L, gt(L1), gt(L));  /* share table of globals */
@@ -108,7 +111,6 @@ lua_State *luaE_newthread (lua_State *L) {
   L1->basehookcount = L->basehookcount;
   L1->hook = L->hook;
   resethookcount(L1);
-  lua_assert(iswhite(obj2gco(L1)));
   return L1;
 }
 
@@ -128,7 +130,9 @@ LUA_API lua_State *lua_newstate () {
   if (l == NULL) return NULL;
   L = tostate(l);
   g = &((LG *)L)->g;
+#ifdef LUA_DEBUG
   L->tt = LUA_TTHREAD;
+#endif
   preinit_state(L, g);
   g->mainthread = L;
   g->strt.size = 0;
@@ -167,7 +171,6 @@ LUA_API void lua_close (lua_State *L) {
     L->base = L->top = L->ci->base;
     L->nCcalls = L->baseCcalls = 0;
   } while (luaD_rawrunprotected(L, callallgcTM, NULL) != 0);
-  lua_assert(G(L)->tmudata == NULL);
   luai_userstateclose(L);
   close_state(L);
 }

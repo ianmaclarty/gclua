@@ -40,16 +40,19 @@ typedef union GCObject GCObject;
 ** Common Header for all collectable objects (in macro form, to be
 ** included in other objects)
 */
+#ifdef LUA_DEBUG
 #define CommonHeader	lu_byte tt
+#endif
 
 
 /*
 ** Common header in struct form
 */
+#ifdef LUA_DEBUG
 typedef struct GCheader {
   CommonHeader;
 } GCheader;
-
+#endif
 
 
 
@@ -110,7 +113,7 @@ typedef struct lua_TValue {
 
 #define checkliveness(g,obj) \
   lua_assert(!iscollectable(obj) || \
-  ((ttype(obj) == (obj)->value.gc->gch.tt) && !isdead(g, (obj)->value.gc)))
+  ((ttype(obj) == (obj)->value.gc->gch.tt)))
 
 
 /* Macros to set values */
@@ -199,7 +202,9 @@ typedef TValue *StkId;  /* index to stack elements */
 typedef union TString {
   L_Umaxalign dummy;  /* ensures maximum alignment for strings */
   struct {
+#ifdef LUA_DEBUG
     CommonHeader;
+#endif
     lu_byte reserved;
     unsigned int hash;
     size_t len;
@@ -215,7 +220,9 @@ typedef union TString {
 typedef union Udata {
   L_Umaxalign dummy;  /* ensures maximum alignment for `local' udata */
   struct {
+#ifdef LUA_DEBUG
     CommonHeader;
+#endif
     struct Table *metatable;
     struct Table *env;
     size_t len;
@@ -229,7 +236,9 @@ typedef union Udata {
 ** Function Prototypes
 */
 typedef struct Proto {
+#ifdef LUA_DEBUG
   CommonHeader;
+#endif
   TValue *k;  /* constants used by the function */
   Instruction *code;
   struct Proto **p;  /* functions defined inside the function */
@@ -245,7 +254,6 @@ typedef struct Proto {
   int sizelocvars;
   int linedefined;
   int lastlinedefined;
-  GCObject *gclist;
   lu_byte nups;  /* number of upvalues */
   lu_byte numparams;
   lu_byte is_vararg;
@@ -272,7 +280,9 @@ typedef struct LocVar {
 */
 
 typedef struct UpVal {
+#ifdef LUA_DEBUG
   CommonHeader;
+#endif
   struct UpVal *uvnext;
   TValue *v;  /* points to stack or to its own value */
   TValue value;  /* the value (when closed) */
@@ -283,9 +293,15 @@ typedef struct UpVal {
 ** Closures
 */
 
+#ifdef LUA_DEBUG
 #define ClosureHeader \
-	CommonHeader; lu_byte isC; lu_byte nupvalues; GCObject *gclist; \
+	CommonHeader; lu_byte isC; lu_byte nupvalues; \
 	struct Table *env
+#else
+#define ClosureHeader \
+	lu_byte isC; lu_byte nupvalues; \
+	struct Table *env
+#endif
 
 typedef struct CClosure {
   ClosureHeader;
@@ -331,14 +347,15 @@ typedef struct Node {
 
 
 typedef struct Table {
+#ifdef LUA_DEBUG
   CommonHeader;
+#endif
   lu_byte flags;  /* 1<<p means tagmethod(p) is not present */ 
   lu_byte lsizenode;  /* log2 of size of `node' array */
   struct Table *metatable;
   TValue *array;  /* array part */
   Node *node;
   Node *lastfree;  /* any free position is before this position */
-  GCObject *gclist;
   int sizearray;  /* size of `array' array */
 } Table;
 

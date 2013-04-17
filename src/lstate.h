@@ -87,7 +87,9 @@ typedef struct global_State {
 ** `per thread' state
 */
 struct lua_State {
+#ifdef LUA_DEBUG
   CommonHeader;
+#endif
   lu_byte status;
   StkId top;  /* first free slot in the stack */
   StkId base;  /* base of current function */
@@ -123,7 +125,9 @@ struct lua_State {
 ** Union of all collectable objects
 */
 union GCObject {
+#ifdef LUA_DEBUG
   GCheader gch;
+#endif
   union TString ts;
   union Udata u;
   union Closure cl;

@@ -486,7 +486,6 @@ LUA_API void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n) {
   while (n--)
     setobj2n(L, &cl->c.upvalue[n], L->top+n);
   setclvalue(L, L->top, cl);
-  lua_assert(iswhite(obj2gco(cl)));
   api_incr_top(L);
   lua_unlock(L);
 }

@@ -234,7 +234,6 @@ static StkId adjust_varargs (lua_State *L, Proto *p, int actual) {
   /* add `arg' parameter */
   if (htab) {
     sethvalue(L, L->top++, htab);
-    lua_assert(iswhite(obj2gco(htab)));
   }
   return base;
 }

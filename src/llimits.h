@@ -10,6 +10,8 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 #include "lua.h"
@@ -50,11 +52,12 @@ typedef LUAI_USER_ALIGNMENT_T L_Umaxalign;
 /* result of a `usual argument conversion' over lua_Number */
 typedef LUAI_UACNUMBER l_uacNumber;
 
-
 /* internal assertions for in-house debugging */
-#ifdef lua_assert
+#ifdef LUA_DEBUG
 
-#define check_exp(c,e)		(lua_assert(c), (e))
+#define lua_assert(c) \
+     { if (!(c)) { fprintf(stderr, "%s:%d: Assertion failed: %s", __FILE__, __LINE__, #c); exit(EXIT_FAILURE); } }
+#define check_exp(c,e)		((lua_assert(c)), (e))
 #define api_check(l,e)		lua_assert(e)
 
 #else
