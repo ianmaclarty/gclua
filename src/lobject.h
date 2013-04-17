@@ -40,7 +40,6 @@ typedef union GCObject GCObject;
 ** Common Header for all collectable objects (in macro form, to be
 ** included in other objects)
 */
-//#define CommonHeader	GCObject *next; lu_byte tt; lu_byte marked
 #define CommonHeader	lu_byte tt
 
 
@@ -201,7 +200,6 @@ typedef union TString {
   L_Umaxalign dummy;  /* ensures maximum alignment for strings */
   struct {
     CommonHeader;
-    //union TString *snext;
     lu_byte reserved;
     unsigned int hash;
     size_t len;
@@ -277,13 +275,7 @@ typedef struct UpVal {
   CommonHeader;
   struct UpVal *uvnext;
   TValue *v;  /* points to stack or to its own value */
-  //union {
-    TValue value;  /* the value (when closed) */
-    //struct {  /* double linked list (when open) */
-    //  struct UpVal *prev;
-    //  struct UpVal *next;
-    //} l;
-  //} u;
+  TValue value;  /* the value (when closed) */
 } UpVal;
 
 
