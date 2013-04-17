@@ -1,0 +1,3 @@
+0 >>> trace-calls.lua:31 return sethook [C] 
+0 >>> end trace-calls.lua
+0 >>> return (C) [C] 
